@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PMD221 — Surface Study</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <p class="eyebrow">MARANTZ PLUGIN / SURFACE STUDY 01</p>
+        <h1>PMD221</h1>
+      </div>
+      <div class="view-switch" role="group" aria-label="View mode">
+        <button data-view="skin">4K SKIN</button>
+        <button class="active" data-view="model">3D OBJECT</button>
+      </div>
+    </header>
+
+    <section id="modelView" class="viewer active" aria-label="Interactive 3D model">
+      <div class="stage" id="stage">
+        <div class="deck" id="deck">
+          <div class="face top"></div>
+          <div class="face bottom"></div>
+          <div class="face front"></div>
+          <div class="face back"></div>
+          <div class="face left"></div>
+          <div class="face right"></div>
+        </div>
+      </div>
+      <p class="hint">DRAG TO ROTATE · SCROLL TO ZOOM · DOUBLE-CLICK TO RESET</p>
+    </section>
+
+    <section id="skinView" class="viewer skin-view" aria-label="4K plugin skin">
+      <img src="assets/pmd221-skin-4k-exact.png" alt="Perspective-corrected PMD221 top control panel">
+    </section>
+
+    <footer>
+      <span>PHOTOGRAMMETRIC REFERENCE</span>
+      <span>UNIT 01 · ORIGINAL WEAR PRESERVED</span>
+    </footer>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+.DS_Store
+node_modules/
+npm-debug.log*
+
+# Native plugin builds and large measurement data
+/build*/
+/plugin/build*/
+/measurements/stimuli/
+/measurements/raw/
+/measurements/working/
+__pycache__/

@@ -1,0 +1,21 @@
+name: Plugin scaffold
+on: [push, pull_request, workflow_dispatch]
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [macos-14, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S plugin -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build --config Release --parallel 2
+      - name: DSP tests
+        run: ctest --test-dir build -C Release --output-on-failure
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CassetteLab-${{ matrix.os }}
+          path: build/CassetteLab_artefacts/Release/
+          if-no-files-found: error
