@@ -95,16 +95,16 @@ void CassetteEditor::resized() {
                       {&output, &outputLabel}, {&mix, &mixLabel}}) {
         const int x = 24 + i++ * 174;
         pair.first->setBounds(juce::Rectangle<float>(static_cast<float>(x), 626, 150, 106)
-                                 .scaled(scale).toNearestInt());
+                                 .transformedBy(juce::AffineTransform::scale(scale)).toNearestInt());
         pair.second->setBounds(juce::Rectangle<float>(static_cast<float>(x), 606, 150, 20)
-                                  .scaled(scale).toNearestInt());
+                                  .transformedBy(juce::AffineTransform::scale(scale)).toNearestInt());
     }
 }
 
 void CassetteEditor::timerCallback() {
     inLevel = processor.inputLevel(); outLevel = processor.outputLevel();
     const float scale = static_cast<float>(getWidth()) / 840.0f;
-    repaint(juce::Rectangle<float>(550, 606, 280, 130).scaled(scale).toNearestInt());
+    repaint(juce::Rectangle<float>(550, 606, 280, 130).transformedBy(juce::AffineTransform::scale(scale)).toNearestInt());
 }
 
 void CassetteEditor::drawMeter(juce::Graphics& g, juce::Rectangle<float> area, float level,

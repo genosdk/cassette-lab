@@ -20,14 +20,14 @@ Restart the host / rescan after installation. Development builds are not signed/
 
 ## What works now
 
-Mono or stereo matching buses; generic editable UI; stable automatable parameter IDs;
+Mono or stereo matching buses; resizable native photographic editor; stable automatable parameter IDs;
 XML state recall; 20 ms gain smoothing; zero latency; independent framework-free DSP core.
 Input gain affects wet path, output gain affects the final mix. At unity, dry and wet are identical.
 There is NO tape saturation, measured EQ, wow/flutter or hiss yet. No inert controls advertise these.
 Stereo host support does not imply the reference recorder is stereo.
 
 DSP-only build: add -DCASSETTE_BUILD_PLUGIN=OFF (no JUCE download).
-GitHub workflow builds macOS/Windows and uploads development artifacts once connected to a repo.
+GitHub workflow builds macOS/Windows, validates VST3 with pluginval level 10 and AU with auval, and uploads development ZIPs. A CI-only preview tool renders the native editor at three sizes.
 Do not ship until applicable JUCE/SDK licensing and product identity are settled.
 
 ## Acceptance before listening builds
@@ -44,4 +44,8 @@ These host checks are pending, not claimed completed by CI.
 2. Fit record/playback response and level-dependent saturation; compare held-out music at matched level.
 3. Add oversampling with explicit latency and dry-path alignment; test alias rejection.
 4. Add shared-transport fractional delay for wow/flutter, calibrated hiss, then dropouts.
-5. Bind the existing high-resolution skin to the same parameters; 3D showcase stays separate.
+The existing photographic master is embedded byte-for-byte in the native editor. The 3D showcase stays separate and paused.
+
+## Native controls
+
+Input and Output use dB readouts; Mix uses percent. Drag a dial, type its value, or double-click to reset. Host automation and saved parameter IDs remain unchanged. Peak meters show the loudest channel before Input gain and after Output gain; these are digital peak meters with a 350 ms release, not calibrated analog VU meters. The visible tape-model status remains pending until hardware captures are analyzed.

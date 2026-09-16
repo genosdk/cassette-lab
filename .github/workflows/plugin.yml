@@ -37,12 +37,12 @@ jobs:
         shell: bash
         run: |
           chmod +x validation-tools/pluginval.app/Contents/MacOS/pluginval
-          validation-tools/pluginval.app/Contents/MacOS/pluginval --headless --strictness-level 5 --validate "$PWD/build/CassetteLab_artefacts/Release/VST3/Cassette Lab.vst3"
+          validation-tools/pluginval.app/Contents/MacOS/pluginval --headless --strictness-level 10 --validate "$PWD/build/CassetteLab_artefacts/Release/VST3/Cassette Lab.vst3"
       - name: Validate VST3 on Windows
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          & ./validation-tools/pluginval.exe --headless --strictness-level 5 --validate "$pwd/build/CassetteLab_artefacts/Release/VST3/Cassette Lab.vst3"
+          & ./validation-tools/pluginval.exe --headless --strictness-level 10 --validate "$pwd/build/CassetteLab_artefacts/Release/VST3/Cassette Lab.vst3"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Validate Audio Unit
         if: runner.os == 'macOS'
