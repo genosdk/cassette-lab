@@ -16,6 +16,15 @@ jobs:
         run: cmake --build build --config Release --parallel 2
       - name: DSP tests
         run: ctest --test-dir build -C Release --output-on-failure
+      - name: Render native editor at three sizes
+        if: runner.os == 'macOS'
+        run: build/CassettePreview_artefacts/Release/CassettePreview.app/Contents/MacOS/CassettePreview
+      - uses: actions/upload-artifact@v4
+        if: runner.os == 'macOS'
+        with:
+          name: CassetteLab-editor-preview
+          path: ui-preview/*.png
+          if-no-files-found: error
       - name: Download pluginval 1.0.4
         shell: bash
         run: |

@@ -27,9 +27,18 @@ if(CASSETTE_BUILD_PLUGIN)
     IS_SYNTH FALSE NEEDS_MIDI_INPUT FALSE NEEDS_MIDI_OUTPUT FALSE
     IS_MIDI_EFFECT FALSE COPY_PLUGIN_AFTER_BUILD FALSE
     VST3_CATEGORIES Fx)
-  target_sources(CassetteLab PRIVATE src/PluginProcessor.cpp)
+  juce_add_binary_data(CassetteArtwork HEADER_NAME CassetteArtwork.h NAMESPACE CassetteArtwork
+    SOURCES ../public/assets/pmd221-skin-4k-exact.png)
+  set_target_properties(CassetteArtwork PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
+  target_sources(CassetteLab PRIVATE src/PluginProcessor.cpp src/PluginEditor.cpp)
   target_compile_definitions(CassetteLab PUBLIC JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0
     JUCE_VST3_CAN_REPLACE_VST2=0)
-  target_link_libraries(CassetteLab PRIVATE cassette_dsp juce::juce_audio_utils
+  target_link_libraries(CassetteLab PRIVATE cassette_dsp CassetteArtwork juce::juce_audio_utils
     PUBLIC juce::juce_recommended_config_flags juce::juce_recommended_warning_flags)
+  if(BUILD_TESTING AND APPLE)
+    juce_add_gui_app(CassettePreview PRODUCT_NAME "CassettePreview")
+    target_sources(CassettePreview PRIVATE tests/EditorPreview.cpp)
+    target_include_directories(CassettePreview PRIVATE src)
+    target_link_libraries(CassettePreview PRIVATE CassetteLab juce::juce_audio_utils)
+  endif()
 endif()

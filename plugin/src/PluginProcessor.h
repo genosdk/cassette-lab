@@ -8,7 +8,10 @@ public:
     void releaseResources() override {}
     bool isBusesLayoutSupported(const BusesLayout&) const override;
     void processBlock(juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
-    juce::AudioProcessorEditor* createEditor() override { return new juce::GenericAudioProcessorEditor(*this); }
+    juce::AudioProcessorEditor* createEditor() override;
+    juce::AudioProcessorValueTreeState& parameters() noexcept { return state; }
+    float inputLevel() const noexcept { return inputPeak.load(std::memory_order_relaxed); }
+    float outputLevel() const noexcept { return outputPeak.load(std::memory_order_relaxed); }
     bool hasEditor() const override { return true; }
     const juce::String getName() const override { return "Cassette Lab"; }
     bool acceptsMidi() const override { return false; }
@@ -26,6 +29,9 @@ private:
     juce::AudioProcessorValueTreeState state;
     std::atomic<float> *input, *output, *mix;
     cassette::Engine engine;
+    std::atomic<float> inputPeak {0}, outputPeak {0};
+    float inputEnvelope = 0, outputEnvelope = 0;
+    double meterSampleRate = 44100;
     static juce::AudioProcessorValueTreeState::ParameterLayout layout();
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CassetteProcessor)
 };

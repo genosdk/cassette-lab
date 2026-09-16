@@ -1,4 +1,5 @@
 #include "PluginProcessor.h"
+#include "PluginEditor.h"
 juce::AudioProcessorValueTreeState::ParameterLayout CassetteProcessor::layout() {
     juce::AudioProcessorValueTreeState::ParameterLayout p;
     p.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"input_db", 1}, "Input (dB)", -24.0f, 24.0f, 0.0f));
@@ -15,6 +16,10 @@ CassetteProcessor::CassetteProcessor()
    mix(state.getRawParameterValue("mix")) {}
 void CassetteProcessor::prepareToPlay(double rate, int) {
     engine.prepare(rate, input->load(), output->load(), mix->load());
+    meterSampleRate = rate;
+    inputEnvelope = outputEnvelope = 0;
+    inputPeak.store(0, std::memory_order_relaxed);
+    outputPeak.store(0, std::memory_order_relaxed);
     setLatencySamples(0);
 }
 bool CassetteProcessor::isBusesLayoutSupported(const BusesLayout& b) const {
@@ -24,8 +29,20 @@ bool CassetteProcessor::isBusesLayoutSupported(const BusesLayout& b) const {
 }
 void CassetteProcessor::processBlock(juce::AudioBuffer<float>& audio, juce::MidiBuffer&) {
     juce::ScopedNoDenormals guard;
+    if (audio.getNumSamples() == 0) return;
+    const auto peak = [&audio]() {
+        float value = 0;
+        for (int channel = 0; channel < audio.getNumChannels(); ++channel)
+            value = std::max(value, audio.getMagnitude(channel, 0, audio.getNumSamples()));
+        return value;
+    };
+    const float decay = static_cast<float>(std::exp(-static_cast<double>(audio.getNumSamples()) / (0.35 * meterSampleRate)));
+    inputEnvelope = std::max(peak(), inputEnvelope * decay);
+    inputPeak.store(inputEnvelope, std::memory_order_relaxed);
     engine.setParameters(input->load(), output->load(), mix->load());
     engine.process(audio.getArrayOfWritePointers(), audio.getNumChannels(), audio.getNumSamples());
+    outputEnvelope = std::max(peak(), outputEnvelope * decay);
+    outputPeak.store(outputEnvelope, std::memory_order_relaxed);
 }
 void CassetteProcessor::getStateInformation(juce::MemoryBlock& data) {
     auto tree = state.copyState();
@@ -37,3 +54,5 @@ void CassetteProcessor::setStateInformation(const void* data, int size) {
         if (xml->hasTagName(state.state.getType())) state.replaceState(juce::ValueTree::fromXml(*xml));
 }
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter() { return new CassetteProcessor(); }
+
+juce::AudioProcessorEditor* CassetteProcessor::createEditor() { return new CassetteEditor(*this); }
