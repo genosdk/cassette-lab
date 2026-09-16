@@ -47,7 +47,16 @@ std::vector<float> render(double rate, int channels, int blockSize, bool offline
             for (int n = 0; n < count; ++n) {
                 const float sample = audio.getSample(c, n);
                 check(std::isfinite(sample), "Nonfinite output");
-                if (start < change) check(sample == (c == 0 ? 0.25f : -0.125f), "Default processing not transparent");
+                if (start < change) {
+                    // JUCE's 0.01 dB range snapping can round nominal zero on
+                    // ARM fused multiply-add. Bound error below -140 dBFS.
+                    const float expected = c == 0 ? 0.25f : -0.125f;
+                    if (std::abs(sample - expected) > 1e-7f) {
+                        std::cerr << "Unity error: " << (sample - expected)
+                                  << ", rate: " << rate << ", channel: " << c << '\n';
+                        check(false, "Default processing not transparent");
+                    }
+                }
                 output[static_cast<size_t>(c * total + start + n)] = sample;
             }
         start += count;
