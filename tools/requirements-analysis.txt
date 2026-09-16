@@ -1,0 +1,2 @@
+# Optional analysis tools; intake and signal generation remain standard-library-only.
+numpy==2.3.5

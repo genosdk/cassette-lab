@@ -1,5 +1,12 @@
 # Validation status
 
+## Synthetic alignment tooling — 2026-09-16
+
+- Added read-only integer-delay/polarity/relative-gain analysis for mono PCM WAV pairs, with input hashes and ambiguity checks.
+- All 15 tooling tests PASS locally. New synthetic fixtures recover known delays, gains and polarity; reject ambiguous/unrelated signals and invalid input; and verify original WAV bytes are preserved.
+- NumPy 2.3.5 is pinned for optional analysis and installed by the measurement-tool CI workflow. Generation/intake remain standard-library-only.
+- No physical recorder response is inferred from these synthetic tests. Fractional delay, drift tracking and response/distortion analysis remain future gates.
+
 ## Measurement preparation — 2026-09-16
 
 - Added read-only stimulus-set verification and overwrite protection for signal generation.
