@@ -44,7 +44,7 @@ These host checks are pending, not claimed completed by CI.
 2. Fit record/playback response and level-dependent saturation; compare held-out music at matched level.
 3. Add oversampling with explicit latency and dry-path alignment; test alias rejection.
 4. Add shared-transport fractional delay for wow/flutter, calibrated hiss, then dropouts.
-The existing photographic master is embedded byte-for-byte in the native editor. The 3D showcase stays separate and paused.
+The user-approved IMG_0483.png temporary skin is embedded byte-for-byte as public/assets/pmd221-reference.png (1536 x 1024; original resolution). The earlier 4K artwork remains archived in assets. The 3D showcase stays separate and paused.
 
 ## Native controls
 

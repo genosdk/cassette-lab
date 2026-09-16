@@ -29,8 +29,8 @@ void CassetteEditor::DialStyle::drawRotarySlider(juce::Graphics& g, int x, int y
 
 CassetteEditor::CassetteEditor(CassetteProcessor& p) : AudioProcessorEditor(p), processor(p) {
     setLookAndFeel(&style);
-    faceplate = juce::ImageCache::getFromMemory(CassetteArtwork::pmd221skin4kexact_png,
-                                               CassetteArtwork::pmd221skin4kexact_pngSize);
+    faceplate = juce::ImageCache::getFromMemory(CassetteArtwork::pmd221reference_png,
+                                               CassetteArtwork::pmd221reference_pngSize);
     auto setup = [this](juce::Slider& slider, juce::Label& label, const juce::String& name,
                        double resetValue, const juce::String& tip) {
         slider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
