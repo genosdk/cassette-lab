@@ -1,5 +1,18 @@
 # Validation status
 
+## Approved temporary skin build — 2026-09-16
+
+- Commit f65a59274d9331377f5f2b57f2939d6e396004c5: macOS arm64 and Windows builds PASS in https://github.com/genosdk/cassette-lab/actions/runs/35079854011.
+- Engine and processor tests PASS on both platforms: saved settings, invalid-state rejection, unity gain within 1e-7 absolute sample error, automation, mono/stereo and realtime/offline equivalence at 44.1/48/96/192 kHz.
+- Corrected two test assumptions: Mix uses 0.01 steps, and ARM fused arithmetic can round nominal zero dB during JUCE range snapping. Production processing and parameter IDs were unchanged.
+- pluginval strictness 10 PASS on both platforms; Apple auval PASS; complete macOS signatures and signatures after ZIP extraction PASS.
+- Approved IMG_0483.png skin preserved at 1536 x 1024; local and GitHub blob SHA match: acf2f38ff9cc0ad928f071acacdd22bdbe31f71a.
+- Native editor previews rendered at all three sizes. Visual inspection remains pending because preview download returned HTTP 403 in this environment.
+- macOS artifact: https://github.com/genosdk/cassette-lab/actions/runs/35079854011/artifacts/10439698512.
+- Updated build still needs user review in Logic; tape DSP remains pending hardware measurements.
+
+## Previous validation history
+
 - Framework-free DSP compiled with GCC 13, C++17 and warnings-as-errors: PASS.
 - CMake DSP-only configure/build and CTest: PASS.
 - 18 generated 96 kHz / mono / 24-bit PCM WAVs: header, duration, silent padding, headroom and SHA-256 verified.
