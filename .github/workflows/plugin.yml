@@ -2,6 +2,7 @@ name: Plugin scaffold
 on: [push, pull_request, workflow_dispatch]
 jobs:
   build:
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -15,8 +16,45 @@ jobs:
         run: cmake --build build --config Release --parallel 2
       - name: DSP tests
         run: ctest --test-dir build -C Release --output-on-failure
+      - name: Download pluginval 1.0.4
+        shell: bash
+        run: |
+          mkdir -p validation-tools
+          if [[ "$RUNNER_OS" == "macOS" ]]; then platform=macOS; else platform=Windows; fi
+          curl --fail --location --retry 3 "https://github.com/Tracktion/pluginval/releases/download/v1.0.4/pluginval_${platform}.zip" -o validation-tools/pluginval.zip
+          unzip -q validation-tools/pluginval.zip -d validation-tools
+      - name: Validate VST3 on macOS
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          chmod +x validation-tools/pluginval.app/Contents/MacOS/pluginval
+          validation-tools/pluginval.app/Contents/MacOS/pluginval --headless --strictness-level 5 --validate "$PWD/build/CassetteLab_artefacts/Release/VST3/Cassette Lab.vst3"
+      - name: Validate VST3 on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          & ./validation-tools/pluginval.exe --headless --strictness-level 5 --validate "$pwd/build/CassetteLab_artefacts/Release/VST3/Cassette Lab.vst3"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Validate Audio Unit
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          mkdir -p "$HOME/Library/Audio/Plug-Ins/Components"
+          ditto "build/CassetteLab_artefacts/Release/AU/Cassette Lab.component" "$HOME/Library/Audio/Plug-Ins/Components/Cassette Lab.component"
+          auval -v aufx Cslt Usrg
+      - name: Package macOS bundles with executable permissions
+        if: runner.os == 'macOS'
+        run: |
+          mkdir -p packages
+          ditto -c -k --sequesterRsrc --keepParent build/CassetteLab_artefacts/Release packages/CassetteLab-macOS-arm64.zip
+      - name: Package Windows build
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force packages
+          Compress-Archive -Path build/CassetteLab_artefacts/Release/* -DestinationPath packages/CassetteLab-Windows.zip
       - uses: actions/upload-artifact@v4
         with:
           name: CassetteLab-${{ matrix.os }}
-          path: build/CassetteLab_artefacts/Release/
+          path: packages/*.zip
           if-no-files-found: error
