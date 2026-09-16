@@ -16,6 +16,18 @@ jobs:
         run: cmake --build build --config Release --parallel 2
       - name: DSP tests
         run: ctest --test-dir build -C Release --output-on-failure
+      - name: Sign and verify complete macOS development bundles
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          for bundle in \
+            "build/CassetteLab_artefacts/Release/AU/Cassette Lab.component" \
+            "build/CassetteLab_artefacts/Release/VST3/Cassette Lab.vst3" \
+            "build/CassetteLab_artefacts/Release/Standalone/Cassette Lab.app"; do
+            codesign --force --sign - --timestamp=none "$bundle"
+            codesign --verify --deep --strict --verbose=2 "$bundle"
+            test -s "$bundle/Contents/_CodeSignature/CodeResources"
+          done
       - name: Render native editor at three sizes
         if: runner.os == 'macOS'
         run: build/CassettePreview_artefacts/Release/CassettePreview.app/Contents/MacOS/CassettePreview
@@ -63,7 +75,17 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           mkdir -p packages
+          cp docs/mac-installation.txt build/CassetteLab_artefacts/Release/INSTALL-MAC.txt
           ditto -c -k --sequesterRsrc --keepParent build/CassetteLab_artefacts/Release packages/CassetteLab-macOS-arm64.zip
+          ditto -x -k packages/CassetteLab-macOS-arm64.zip package-verification
+          for bundle in \
+            "package-verification/Release/AU/Cassette Lab.component" \
+            "package-verification/Release/VST3/Cassette Lab.vst3" \
+            "package-verification/Release/Standalone/Cassette Lab.app"; do
+            codesign --verify --deep --strict --verbose=2 "$bundle"
+            test -s "$bundle/Contents/_CodeSignature/CodeResources"
+          done
+          (cd packages && shasum -a 256 CassetteLab-macOS-arm64.zip > CassetteLab-macOS-arm64.zip.sha256)
       - name: Package Windows build
         if: runner.os == 'Windows'
         shell: pwsh
@@ -73,5 +95,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: CassetteLab-${{ matrix.os }}
-          path: packages/*.zip
+          path: packages/*
           if-no-files-found: error

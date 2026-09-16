@@ -1,0 +1,44 @@
+CASSETTE LAB — APPLE SILICON DEVELOPMENT BUILD
+
+This build is ad-hoc signed at the complete-bundle level and signature-verified
+again after ZIP extraction. It is not Developer ID signed or Apple notarized.
+The signature checks integrity; it does not establish an Apple-verified publisher.
+
+INSTALL FOR LOGIC
+1. Quit Logic.
+2. Unzip the GitHub artifact, then unzip CassetteLab-macOS-arm64.zip inside it.
+   Do not copy individual files out of the .component bundle.
+3. Move the old Cassette Lab.component out of the Components folder and keep it
+   as a backup. Copy Release/AU/Cassette Lab.component to ONE location:
+   Current user: ~/Library/Audio/Plug-Ins/Components/
+   All users: /Library/Audio/Plug-Ins/Components/
+   Do not leave conflicting copies in both locations.
+4. For the all-users location, verify in Terminal:
+
+codesign --verify --deep --strict --verbose=2 "/Library/Audio/Plug-Ins/Components/Cassette Lab.component"
+
+It should report valid on disk and satisfies its Designated Requirement.
+If verification fails, stop and report the output; do not re-sign a damaged copy.
+
+DEVELOPMENT-BUILD DOWNLOAD APPROVAL
+The browser may attach a quarantine flag. If the verified build is blocked,
+first check System Settings > Privacy & Security for an approval option.
+For this project's trusted development build only, after successful signature
+verification, the following removes the download quarantine from this one plugin:
+
+sudo xattr -dr com.apple.quarantine "/Library/Audio/Plug-Ins/Components/Cassette Lab.component"
+
+This does not disable Gatekeeper globally or alter other plugins. Enter your Mac
+login password if prompted; Terminal does not display password characters.
+For a current-user install, substitute "$HOME/Library/..." and omit sudo.
+
+Restart the Mac after installing, then open Logic. In Plug-in Manager select
+Cassette Lab and Reset & Rescan Selection if needed. Find it under
+Audio FX > Audio Units > USR > Cassette Lab on an audio track.
+
+OPTIONAL ARCHIVE INTEGRITY CHECK
+From the folder containing the inner ZIP and its .sha256 file:
+shasum -a 256 -c CassetteLab-macOS-arm64.zip.sha256
+
+VST3 and Standalone are also included. Install the VST3 in the equivalent
+Audio/Plug-Ins/VST3 directory if needed; Logic uses the AU .component.
