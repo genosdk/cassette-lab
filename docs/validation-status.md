@@ -11,7 +11,10 @@
 - macOS downloads are wrapped in a ZIP before artifact upload to preserve bundle executable permissions.
 - Native editor renders generated at 720, 840 and 1200 pixel window widths (2x PNG output). Automated editor checks pass; visual review remains pending because the artifact download returned HTTP 403 in the development environment.
 - Native editor embeds the unchanged photographic master, automatable Input/Output/Mix controls, and digital input/output peak meters.
-- Manual DAW scan, listening, automation and project state recall: pending on the user's machine.
+- Logic AU scan and loading as an audio effect: PASS, reported by the user on 2026-09-16 after installing the signing fix.
+- Manual listening, automation, project state recall, bypass and offline bounce: pending on the user's machine.
+- Complete macOS bundle signatures and signatures after ZIP extraction: PASS in run 35072133249, commit 50c06f5. AU validation also passed.
+- Read-only measurement intake checker: PCM/float fixtures, channel statistics, invalid samples, duplicate detection and truncation tests PASS.
 - Local Linux full JUCE compilation remains unavailable because development packages are missing; system package installation is restricted in this environment.
 - Hardware measurements and tape DSP calibration: pending captures.
 

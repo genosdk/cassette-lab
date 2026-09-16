@@ -16,7 +16,7 @@ Requires network for first JUCE fetch. Outputs: build/CassetteLab_artefacts/Rele
 For universal Mac builds use '-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64' in a fresh build directory.
 Windows uses the same commands without the OSX option and builds VST3 + Standalone.
 Copy .component to ~/Library/Audio/Plug-Ins/Components and .vst3 to ~/Library/Audio/Plug-Ins/VST3.
-Restart the host / rescan after installation. Development builds are not signed/notarized releases.
+Restart the host / rescan after installation. CI Mac builds are ad-hoc signed, but not Apple-notarized releases. See ../docs/mac-installation.txt.
 
 ## What works now
 
