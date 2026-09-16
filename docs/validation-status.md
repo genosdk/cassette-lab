@@ -1,5 +1,12 @@
 # Validation status
 
+## Synthetic tone analysis — 2026-09-16
+
+- Added stationary-tone harmonic fitting and discrete return/reference gain comparison. No plugin DSP or artwork changed.
+- All 21 tooling tests PASS locally. Known cubic harmonics and two-tap filter response at 100 Hz, 1 kHz and 10 kHz match analytical results.
+- Tests cover phase/DC/noninteger cycles, noise, wrong frequency, Nyquist omissions, invalid segments and WAV byte preservation.
+- Requires a supplied stationary fundamental; drift estimation and continuous sweep response are not implemented. Partial harmonic THD and residual are explicitly distinguished from standardized THD+N.
+
 ## Synthetic alignment tooling — 2026-09-16
 
 - Added read-only integer-delay/polarity/relative-gain analysis for mono PCM WAV pairs, with input hashes and ambiguity checks.

@@ -33,3 +33,22 @@ Synthetic tests cover positive/negative/zero delays, polarity inversion, gain/DC
 ## Logic host checks still needed
 
 The user confirmed AU loading as an effect on 2026-09-16. At Input 0 dB, Output 0 dB and Mix 100%, the current scaffold should sound transparent. Compare bypass at matched level. Then automate Input/Output/Mix, save and reopen a project with nondefault settings, try mono and stereo instances, and compare realtime playback with an offline bounce. Record Logic/macOS versions, sample rate, buffer size and any differences. Successful loading alone does not establish these results.
+
+## Stationary tone harmonics and discrete response points
+
+`analyze_tone.py` uses the same optional NumPy dependency and mono PCM reader as alignment. Select an explicitly known steady portion, excluding silence, fades and transport settling:
+
+```sh
+python3 tools/analyze_tone.py return.wav --frequency 1000 --start 3 --duration 1
+python3 tools/analyze_tone.py return.wav --frequency 1000 --start 3 --duration 1 --reference loopback.wav --reference-start 3
+```
+
+Times above are examples, not automatically discovered offsets. The supplied frequency must match the actual stationary fundamental; the tool does not estimate frequency or track tape drift. Reference and return segments may start at different times, must have equal requested duration and matching sample rates, and need at least 20 cycles. The tool does not alter either WAV and records full-file SHA-256 hashes and selected segment times.
+
+A simultaneous least-squares fit estimates DC and sine/cosine components at the fundamental and harmonics (default orders 1–5, configurable to 20). It handles noninteger cycle counts at the correct frequency without treating window leakage as distortion. Harmonics at or above Nyquist are explicitly omitted. `thd_ratio` is the root-sum-square amplitude of only the reported higher harmonics divided by the fundamental; it is null when no higher harmonic can be measured. Multiply the ratio by 100 for percent. This is partial THD, not a standardized full-band THD+N result. A fitted residual includes noise, unmodeled harmonics, drift and frequency error; it must not be called tape hiss.
+
+The optional reference reports the return/reference fundamental ratio in dB at this one frequency. Repeating with the 100 Hz, 1 kHz and 10 kHz recordings produces discrete response points, not a continuous sweep response. Comparing to a loopback removes its fundamental gain at that frequency only; it does not isolate tape distortion from electronics or subtract the reference's harmonics.
+
+A residual above 5% of fundamental RMS marks the fit for review and suppresses a pair's gain result. This is a provisional diagnostic threshold, not a calibration acceptance criterion. Exit codes are 0 for an accepted fit, 2 for review and 1 for invalid input. Review clipping with the intake inventory first. All reported values on a review result are diagnostic only. Long segments use memory proportional to their length and harmonic count; start with a one-second stationary portion.
+
+Synthetic validation covers known DC/phase/harmonics with noninteger cycles, an analytically derived cubic distortion spectrum, a known two-tap filter at three frequencies, injected noise, wrong frequency, Nyquist omissions, invalid input and unchanged WAV bytes. These fixtures do not establish accuracy on drifting physical tape. Frequency estimation/drift tracking and continuous sweep analysis remain later work.
