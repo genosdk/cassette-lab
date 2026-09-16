@@ -1,5 +1,13 @@
 # Validation status
 
+## Measurement preparation — 2026-09-16
+
+- Added read-only stimulus-set verification and overwrite protection for signal generation.
+- All 10 Python measurement-tool tests PASS locally, including altered audio, invalid manifests, duplicate/path entries, incorrect headers/padding and overwrite refusal.
+- Existing complete 18-file 96 kHz stimulus set PASS; regenerated reference WAV is byte-identical to the prior generator output.
+- Dedicated Python 3.11 CI workflow added. No plugin processing, skin or original recordings changed; generated audio remains excluded from Git.
+- Hardware response fitting, saturation calibration and measured wow/flutter/noise still require captures. The analysis implementation can continue against synthetic fixtures before captures arrive; such tests cannot validate a match to the physical recorder.
+
 ## Approved temporary skin build — 2026-09-16
 
 - Commit f65a59274d9331377f5f2b57f2939d6e396004c5: macOS arm64 and Windows builds PASS in https://github.com/genosdk/cassette-lab/actions/runs/35079854011.

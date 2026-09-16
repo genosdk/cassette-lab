@@ -21,6 +21,9 @@ The generated dBFS values describe digital sine peak amplitude, not analog dBu o
 ## Files to generate
 
 Run `python3 tools/generate_stimuli.py --out measurements/stimuli`.
+Requires Python 3.11 or newer. The output directory must be new or empty; generation refuses to overwrite any existing files. To regenerate, choose a new directory and retain the old set.
+
+Before recording or after transferring the test set, run `python3 tools/verify_stimuli.py measurements/stimuli`. A successful report checks all 18 expected files, SHA-256 hashes against their manifest, mono/24-bit headers, sample rates, durations and silent padding. It reads files without changing them. Keep the original manifest: this verifies consistency, not authenticity against a manifest someone has also modified, and it does not establish hardware calibration.
 Each file has two seconds of silence before and after signal, with 10 ms edge fades.
 
 | Signal | Active duration | Digital peak | Purpose |
