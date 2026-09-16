@@ -1,5 +1,11 @@
 # Validation status
 
+## Synthetic carrier tracking — 2026-09-16
+
+- Added read-only windowed frequency estimation and drift tracking.
+- All 27 tooling tests PASS locally, including known stationary offset, linear drift, slow modulation, dropout/noise/boundary rejection and unchanged input bytes.
+- Summary is withheld when any window fails. Reported frequency deviation is window-averaged and is not standardized wow/flutter. No plugin processing or artwork changed.
+
 ## Synthetic tone analysis — 2026-09-16
 
 - Added stationary-tone harmonic fitting and discrete return/reference gain comparison. No plugin DSP or artwork changed.

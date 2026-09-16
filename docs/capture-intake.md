@@ -52,3 +52,17 @@ The optional reference reports the return/reference fundamental ratio in dB at t
 A residual above 5% of fundamental RMS marks the fit for review and suppresses a pair's gain result. This is a provisional diagnostic threshold, not a calibration acceptance criterion. Exit codes are 0 for an accepted fit, 2 for review and 1 for invalid input. Review clipping with the intake inventory first. All reported values on a review result are diagnostic only. Long segments use memory proportional to their length and harmonic count; start with a one-second stationary portion.
 
 Synthetic validation covers known DC/phase/harmonics with noninteger cycles, an analytically derived cubic distortion spectrum, a known two-tap filter at three frequencies, injected noise, wrong frequency, Nyquist omissions, invalid input and unchanged WAV bytes. These fixtures do not establish accuracy on drifting physical tape. Frequency estimation/drift tracking and continuous sweep analysis remain later work.
+
+## Windowed frequency and drift tracking
+
+```sh
+python3 tools/analyze_drift.py speed-return.wav --start 3 --duration 10 --nominal 3150 --search-hz 100 --window 0.1 --hop 0.05
+```
+
+Choose an active segment; the example does not discover transport start. The mono PCM reader and NumPy dependency are shared with the other analyzers. Original files remain unchanged, and the report includes a SHA-256 checksum and segment start time. Window center times are relative to that segment. Any incomplete trailing window is omitted and its sample count reported.
+
+For each Hann-windowed segment, an FFT finds a spectral peak inside the specified carrier range, then a local numerical search refines its frequency. A stationary harmonic fit checks the candidate. Near-boundary peaks and residuals above 5% of fundamental RMS require review. Silence and invalid windows are reported individually; gaps are never interpolated. A summary is provided only when every window passes. It separates mean pitch offset from RMS windowed frequency deviation around that mean, both relative to the nominal frequency.
+
+This is a preliminary carrier tracker, not a standardized wow/flutter meter. Window averaging smooths rapid modulation; no modulation bandwidth, DIN/IEC weighting or detector is implemented. Noise, neighboring tones and fast modulation can bias or invalidate estimates. The method cannot distinguish tape speed error from recording/playback clock error. Passing these heuristic checks is not proof of measurement accuracy on physical tape. Do not interpret its windowed RMS statistic as a standardized wow/flutter percentage.
+
+Synthetic tests cover a 3163.27 Hz carrier with noise/DC/harmonics, a known 4 Hz/s drift, 3 Hz peak modulation at 0.5 Hz, dropouts, unrelated noise, search boundaries, invalid inputs and unchanged WAV bytes. Fixture tolerances are 0.005 Hz for stationary frequency, 0.01 Hz for the drift trajectory and 0.02 Hz for slow modulation; they are not guaranteed hardware accuracy specifications.
