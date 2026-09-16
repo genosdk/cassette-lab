@@ -4,6 +4,8 @@
 #include <vector>
 
 namespace {
+// The existing host parameter uses 0.01 steps; exercise a representable value.
+constexpr float testMix = 0.37f;
 void check(bool ok, const char* message) {
     if (!ok) { std::cerr << message << '\n'; std::exit(1); }
 }
@@ -13,12 +15,12 @@ void set(CassetteProcessor& p, const char* id, float value) {
     parameter->setValueNotifyingHost(parameter->convertTo0to1(value));
 }
 void settings(CassetteProcessor& p) {
-    set(p, "input_db", 6.0f); set(p, "output_db", -3.0f); set(p, "mix", 0.375f);
+    set(p, "input_db", 6.0f); set(p, "output_db", -3.0f); set(p, "mix", testMix);
 }
 void verifySettings(CassetteProcessor& p) {
     check(std::abs(p.parameters().getRawParameterValue("input_db")->load() - 6.0f) < 1e-5f, "Input recall failed");
     check(std::abs(p.parameters().getRawParameterValue("output_db")->load() + 3.0f) < 1e-5f, "Output recall failed");
-    check(std::abs(p.parameters().getRawParameterValue("mix")->load() - 0.375f) < 1e-5f, "Mix recall failed");
+    check(std::abs(p.parameters().getRawParameterValue("mix")->load() - testMix) < 1e-5f, "Mix recall failed");
 }
 void buses(CassetteProcessor& p, int channels) {
     auto layout = p.getBusesLayout();
@@ -50,7 +52,7 @@ std::vector<float> render(double rate, int channels, int blockSize, bool offline
             }
         start += count;
     }
-    const float gain = (0.625f + 0.375f * std::pow(10.0f, 6.0f/20.0f)) * std::pow(10.0f, -3.0f/20.0f);
+    const float gain = ((1.0f - testMix) + testMix * std::pow(10.0f, 6.0f/20.0f)) * std::pow(10.0f, -3.0f/20.0f);
     for (int c = 0; c < channels; ++c)
         check(std::abs(output[static_cast<size_t>((c+1)*total-1)] - gain * (c == 0 ? 0.25f : -0.125f)) < 1e-5f, "Final automated gain incorrect");
     check(p.getLatencySamples() == 0, "Unexpected latency");
@@ -61,7 +63,7 @@ std::vector<float> render(double rate, int channels, int blockSize, bool offline
 }
 int main() {
     juce::ScopedJuceInitialiser_GUI init;
-    CassetteProcessor original; settings(original);
+    CassetteProcessor original; settings(original); verifySettings(original);
     juce::MemoryBlock state; original.getStateInformation(state);
     CassetteProcessor restored;
     restored.setStateInformation(state.getData(), static_cast<int>(state.getSize()));
