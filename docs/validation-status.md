@@ -1,5 +1,11 @@
 # Validation status
 
+## Synthetic sweep magnitude — 2026-09-17
+
+- Added read-only whole-record spectral magnitude comparison with input hashes, reference-excitation masking and explicit limitations.
+- All 39 tooling tests PASS locally. Six new tests cover analytical FIR response, delay/polarity/gain, weak excitation, zero return, small additive noise, invalid input, sample-rate mismatch and preserved WAV bytes.
+- This validates numerical behavior under synthetic conditions. Actual recorder response, capture quality and tape drift require hardware recordings; no plugin processing or artwork changed.
+
 ## Synthetic noise spectrum — 2026-09-17
 
 - Added read-only unweighted Welch PSD, AC RMS and selected-band RMS analysis with explicit units, bin edges, DC treatment and tail reporting.

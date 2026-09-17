@@ -80,3 +80,19 @@ The report includes global DC offset, AC RMS over the complete selected segment,
 The level convention is 0 dBFS for RMS amplitude 1, so a full-scale sine is -3.0103 dBFS RMS. Digital silence returns zero power and null logarithmic levels. There is no A-weighting, absolute voltage calibration, automatic hum removal or noise-source attribution. Hum and tones contribute to band power. Successful calculation does not establish that the selected take is suitable for physical calibration. Use the intake clipping/routing checks and session notes first.
 
 Synthetic checks cover seeded white-noise RMS/density/bandwidth, a known moving-average filter spectrum, 60 Hz hum with DC offset, Parseval normalization including Nyquist, silence, invalid inputs, tail accounting and unchanged WAV files. These establish numerical behavior only, not the recorder's actual noise profile.
+
+## Sweep magnitude comparison
+
+Install the optional analysis requirements, then run:
+
+```sh
+python3 tools/analyze_sweep.py reference.wav returned.wav --low-hz 100 --high-hz 15000 > sweep-report.json
+```
+
+Use mono PCM recordings at the same sample rate, containing the complete low-level sweep and its complete response tail, including leading/trailing silence. Files are read only and their SHA-256 hashes are reported. Compare loopback and deck returns with the same excitation and capture settings. No resampling, alignment, normalization or drift correction is applied.
+
+The tool computes the whole-record FFT magnitude ratio at every bin in the requested band. The shorter record is zero-padded to a common length; no taper is applied because it would alter the convolution relationship. A complete constant delay or polarity inversion does not change the magnitude ratio. Truncated tails do. Narrow the band to the region actually excited by the sweep, avoiding its faded edges.
+
+Reference bins below the configurable threshold (default -60 dB relative to the largest reference FFT magnitude) are masked. JSON `accepted` means only that every requested bin meets this excitation threshold. It does **not** establish signal-to-noise ratio, linearity, timing stability or capture validity. Gain is null for masked bins or exactly zero return. Exit codes are 0 for full reference coverage, 2 for masked bins and 1 for invalid input.
+
+Noise, tape speed variation, unequal sweep content and nonlinear distortion can bias the ratio without being detected. Do not interpret high-level sweeps as a linear transfer function. This tool supplies an exploratory magnitude curve, not a calibrated recorder response, impulse response, coherence estimate or fitted plugin model. Original captures should remain untouched.
