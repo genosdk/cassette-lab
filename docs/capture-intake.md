@@ -66,3 +66,17 @@ For each Hann-windowed segment, an FFT finds a spectral peak inside the specifie
 This is a preliminary carrier tracker, not a standardized wow/flutter meter. Window averaging smooths rapid modulation; no modulation bandwidth, DIN/IEC weighting or detector is implemented. Noise, neighboring tones and fast modulation can bias or invalidate estimates. The method cannot distinguish tape speed error from recording/playback clock error. Passing these heuristic checks is not proof of measurement accuracy on physical tape. Do not interpret its windowed RMS statistic as a standardized wow/flutter percentage.
 
 Synthetic tests cover a 3163.27 Hz carrier with noise/DC/harmonics, a known 4 Hz/s drift, 3 Hz peak modulation at 0.5 Hz, dropouts, unrelated noise, search boundaries, invalid inputs and unchanged WAV bytes. Fixture tolerances are 0.005 Hz for stationary frequency, 0.01 Hz for the drift trajectory and 0.02 Hz for slow modulation; they are not guaranteed hardware accuracy specifications.
+
+## Unweighted noise spectrum
+
+```sh
+python3 tools/analyze_noise.py recorded-silence.wav --start 3 --duration 10 --segment-samples 8192 --low-hz 20 --high-hz 20000
+```
+
+Select a stationary noise-only portion using the actual recording notes. The tool cannot determine whether a signal is tape hiss, interface noise, hum or intentional audio. It uses the shared mono PCM reader and optional NumPy dependency, preserves original bytes and records the checksum and segment start time.
+
+The report includes global DC offset, AC RMS over the complete selected segment, and a one-sided Welch power spectral density using symmetric Hann windows with 50% overlap. Only the global mean is removed; each window is not individually detrended. PSD units are full-scale amplitude squared per Hz. Band RMS is the square root of the sum of selected PSD bins times bin spacing. Requested edges include complete bins whose centers fall inside the band; included centers, bin spacing and window equivalent noise bandwidth are reported. This is not an exact brick-wall filter. Incomplete trailing windows are excluded from PSD, with the tail count reported; full-segment AC RMS still includes them.
+
+The level convention is 0 dBFS for RMS amplitude 1, so a full-scale sine is -3.0103 dBFS RMS. Digital silence returns zero power and null logarithmic levels. There is no A-weighting, absolute voltage calibration, automatic hum removal or noise-source attribution. Hum and tones contribute to band power. Successful calculation does not establish that the selected take is suitable for physical calibration. Use the intake clipping/routing checks and session notes first.
+
+Synthetic checks cover seeded white-noise RMS/density/bandwidth, a known moving-average filter spectrum, 60 Hz hum with DC offset, Parseval normalization including Nyquist, silence, invalid inputs, tail accounting and unchanged WAV files. These establish numerical behavior only, not the recorder's actual noise profile.

@@ -1,5 +1,11 @@
 # Validation status
 
+## Synthetic noise spectrum — 2026-09-17
+
+- Added read-only unweighted Welch PSD, AC RMS and selected-band RMS analysis with explicit units, bin edges, DC treatment and tail reporting.
+- All 33 tooling tests PASS locally. New tests cover white noise, analytically filtered noise, 60 Hz hum, Parseval/Nyquist scaling, silence, invalid inputs and preserved WAV bytes.
+- No tape-noise profile or standardized weighted noise measurement is claimed. Plugin audio and artwork are unchanged.
+
 ## Synthetic carrier tracking — 2026-09-16
 
 - Added read-only windowed frequency estimation and drift tracking.
