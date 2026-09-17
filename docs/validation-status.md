@@ -1,5 +1,11 @@
 # Validation status
 
+## Synthetic combined report — 2026-09-17
+
+- Added a read-only compiler for the five analyzer result types, with source-report hashes, schema recognition, unique labels, completeness counts and propagated review status.
+- All 45 tooling tests PASS locally. Six new tests cover complete and partial sets, repeated analysis types, review propagation, malformed or ambiguous JSON, duplicate keys, nonfinite values and preserved source bytes.
+- A complete accepted report means ready for human review only. Hardware identity, routing, capture validity and recorder calibration still require the original session evidence and recordings.
+
 ## Synthetic sweep magnitude — 2026-09-17
 
 - Added read-only whole-record spectral magnitude comparison with input hashes, reference-excitation masking and explicit limitations.

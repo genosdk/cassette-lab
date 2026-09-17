@@ -96,3 +96,20 @@ The tool computes the whole-record FFT magnitude ratio at every bin in the reque
 Reference bins below the configurable threshold (default -60 dB relative to the largest reference FFT magnitude) are masked. JSON `accepted` means only that every requested bin meets this excitation threshold. It does **not** establish signal-to-noise ratio, linearity, timing stability or capture validity. Gain is null for masked bins or exactly zero return. Exit codes are 0 for full reference coverage, 2 for masked bins and 1 for invalid input.
 
 Noise, tape speed variation, unequal sweep content and nonlinear distortion can bias the ratio without being detected. Do not interpret high-level sweeps as a linear transfer function. This tool supplies an exploratory magnitude curve, not a calibrated recorder response, impulse response, coherence estimate or fitted plugin model. Original captures should remain untouched.
+
+## Combined analysis report
+
+After saving analyzer JSON outputs, compile them into one review file:
+
+```sh
+python3 tools/compile_measurement_report.py --session deck-a-tape-01 \
+  --input alignment=alignment-report.json \
+  --input tone-1khz=tone-report.json \
+  --input drift=drift-report.json \
+  --input noise=noise-report.json \
+  --input sweep=sweep-report.json > measurement-report.json
+```
+
+Labels must be unique; an analysis type may occur more than once for multiple levels or frequencies. The compiler recognizes each analyzer by required fields, embeds its complete result, and records the SHA-256 hash and basename of each source report. It rejects duplicate JSON keys, nonfinite JSON values, ambiguous schemas and nonboolean acceptance fields. Input reports are never modified.
+
+`report_ready_for_review` is true only when alignment, tone, drift, noise and sweep results are all represented and every input has `accepted: true`. This is a completeness and numerical-review gate only. It does not validate capture routing, identify the physical recorder, establish calibration or authorize model fitting. Exit code 0 means ready for review, 2 means incomplete or analyzer review required, and 1 means invalid input.
